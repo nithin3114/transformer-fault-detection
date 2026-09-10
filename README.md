@@ -1,74 +1,153 @@
 # Early Fault Detection on Distribution Transformers
 
+A machine learning classification project for identifying whether a distribution transformer is likely to be in a **Fault** or **Normal** condition using transformer information, oil/thermal measurements, and load data.
+
 ## Project Overview
 
-This project develops a binary classification system for early fault detection
-in distribution transformers.
+Distribution transformer faults can lead to equipment damage, service interruptions, and increased maintenance costs. Detecting potential faults early can help maintenance teams identify transformers that may require further inspection before a failure occurs.
 
-The model combines transformer registry information with historical oil/thermal
-readings and load measurements to predict whether a transformer is likely to
-be in a Fault or Normal condition.
+This project develops a binary classification model to predict the condition of a transformer as **Fault** or **Normal**. Transformer registry information is combined with historical oil/thermal readings and load measurements.
+
+The final model is intended as a decision-support tool for prioritizing transformers for further inspection, rather than as a replacement for physical inspection or engineering diagnosis.
+
+## Business Problem
+
+The objective is to identify potentially faulty distribution transformers early using available historical transformer, thermal/oil, and load information.
+
+An effective early-warning system can help maintenance teams prioritize transformers that may require additional inspection or preventive maintenance.
+
+Because missing a faulty transformer can be more costly than incorrectly flagging a normal transformer, this project gives particular attention to **Fault Recall** and **Fault F1-score**, rather than relying only on overall accuracy.
 
 ## Dataset
 
-The project uses five datasets:
+The project uses five datasets provided for the classification task:
 
-- Transformer registry
-- Oil and thermal readings
-- Load logs
-- Labeled transformer fault status
-- Unlabeled transformer records for prediction
+| Dataset | Description | Records |
+|---|---|---:|
+| `transformer_registry.csv` | Transformer installation and equipment information | 232 |
+| `oil_thermal_readings.csv` | Historical oil and thermal measurements | 1,602 |
+| `load_logs.csv` | Historical transformer load measurements | 1,978 |
+| `fault_status_labeled.csv` | Labeled transformer condition (`Fault` / `Normal`) | 198 |
+| `fault_status_to_predict.csv` | Unlabeled transformers for final prediction | 34 |
 
-Sensor and load readings were aggregated at transformer level before being merged
-with the transformer registry data.
+The sensor and load measurements were aggregated at transformer level before being merged with the transformer registry information.
+
+The labeled dataset contains the target variable used for supervised learning:
+
+- `Fault`
+- `Normal`
+
+The 34 unlabeled transformer records were kept separate from model training and were used only during the final prediction stage.
+
+**Dataset source:** Project-provided classification dataset.
+
+## Technologies and Libraries
+
+- Python
+- Jupyter Notebook
+- NumPy
+- Pandas
+- Matplotlib
+- Scikit-learn
+
+The complete dependency list is available in [`requirements.txt`](requirements.txt).
 
 ## Methodology
 
-1. Raw dataset inspection
-2. Data cleaning and aggregation
-3. Exploratory Data Analysis
-4. Feature engineering
-5. Categorical encoding
-6. Numerical feature scaling
-7. Model training and evaluation
-8. Stratified 5-fold cross-validation
-9. Logistic Regression tuning
-10. Final prediction of previously unlabeled transformers
+The project follows the following workflow:
+
+1. Inspect the raw datasets
+2. Check data types, missing values, duplicates, and distributions
+3. Clean and prepare the data
+4. Aggregate historical sensor and load readings at transformer level
+5. Merge the datasets using `transformer_id`
+6. Perform exploratory data analysis
+7. Engineer useful features
+8. Encode categorical variables
+9. Scale numerical features where required
+10. Train and compare classification models
+11. Evaluate models using stratified cross-validation
+12. Tune the selected model
+13. Retrain the final model using the labeled dataset
+14. Predict the condition of the previously unlabeled transformers
 
 ## Models Evaluated
+
+The following classification algorithms were evaluated:
 
 - Logistic Regression
 - Random Forest
 - Support Vector Machine (SVM)
 
-Class imbalance was handled using balanced class weights.
+Because the dataset contains fewer Fault cases than Normal cases, class imbalance was addressed using balanced class weights.
+
+## Evaluation Metrics
+
+Overall accuracy alone can be misleading when the classes are imbalanced.
+
+Therefore, the project focuses particularly on:
+
+- **Fault Precision** — proportion of transformers predicted as Fault that were actually Fault.
+- **Fault Recall** — proportion of actual Fault transformers correctly identified.
+- **Fault F1-score** — balance between Fault precision and Fault recall.
+
+Fault Recall is particularly important in this problem because failing to identify an actual faulty transformer can result in a missed maintenance opportunity.
 
 ## Final Model
 
-The final model was a tuned Logistic Regression model with:
+The selected model is a tuned **Logistic Regression** model with:
 
 - `class_weight="balanced"`
 - `C=10`
 
-The model was selected based primarily on Fault detection performance,
-with particular attention to Fault recall and Fault F1-score.
+The model was selected based primarily on its Fault detection performance, with particular attention to Fault Recall and Fault F1-score.
 
 ## Results
 
-The final tuned Logistic Regression achieved:
+The final tuned Logistic Regression achieved the following cross-validation results:
 
-- Cross-validation Accuracy: 0.676
-- Fault Precision: 0.409
-- Fault Recall: 0.596
-- Fault F1-score: 0.479
+| Metric | Score |
+|---|---:|
+| Accuracy | 0.676 |
+| Fault Precision | 0.409 |
+| Fault Recall | 0.596 |
+| Fault F1-score | 0.479 |
 
-The final model was retrained using all 198 labeled transformers and used to
-predict 34 previously unlabeled transformers.
+### Interpretation
+
+The model correctly identifies approximately **59.6% of the Fault cases** in the cross-validation evaluation.
+
+The Fault Precision of **40.9%** indicates that a considerable number of transformers flagged as Fault were actually Normal.
+
+This means the model should be treated as an **early-warning and prioritization tool**, rather than a definitive fault diagnosis system.
+
+Fault Recall was prioritized because missing an actual fault can be more costly than performing an additional inspection on a transformer that turns out to be normal.
+
+After model selection, the final Logistic Regression model was retrained using all **198 labeled transformers** and used to generate predictions for the **34 previously unlabeled transformers**.
 
 ## Project Structure
 
 ```text
-classification/
+transformer-fault-detection/
+│
 ├── data/
+│   ├── processed_data/
+│   ├── fault_status_labeled.csv
+│   ├── fault_status_to_predict.csv
+│   ├── load_logs.csv
+│   ├── oil_thermal_readings.csv
+│   └── transformer_registry.csv
+│
 ├── notebooks/
-└── src/
+│   ├── 01_dataset_inspection.ipynb
+│   ├── 02_data_cleaning_&_aggregation.ipynb
+│   ├── 03_EDA.ipynb
+│   ├── 04_feature_engineering_modeling_predictions.ipynb
+│   └── 05_conclusion.ipynb
+│
+├── src/
+│
+├── .gitignore
+├── problem_statement.md
+├── README.md
+└── requirements.txt
