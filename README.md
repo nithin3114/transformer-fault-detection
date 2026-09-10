@@ -1,6 +1,6 @@
 # Early Fault Detection on Transformer Units
 
-A machine learning classification project for identifying whether a distribution transformer is likely to be in a **Fault** or **Normal** condition using transformer information, oil/thermal measurements, and load data.
+A machine learning classification project for identifying whether a transformer is likely to be in a **Fault** or **Normal** condition using transformer information, oil/thermal measurements, and load data.
 
 ## Project Overview
 
