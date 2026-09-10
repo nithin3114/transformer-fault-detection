@@ -151,3 +151,93 @@ transformer-fault-detection/
 ├── problem_statement.md
 ├── README.md
 └── requirements.txt
+```
+## How to Run
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/nithin3114/transformer-fault-detection.git
+cd transformer-fault-detection
+```
+
+### 2. Create a Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+### 3. Activate the Environment
+
+For Windows PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+### 4. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Run the Project Pipeline
+
+The `src/` directory contains the Python pipeline developed to run the main project workflow automatically.
+
+The pipeline handles the required data preparation, feature processing, model workflow, and prediction steps without requiring each notebook to be executed manually.
+
+Run the pipeline using:
+
+```bash
+python src/transformer_fault_prediction_pipeline.py
+```
+### 6. Explore the Project Using Jupyter Notebook
+
+To inspect the analysis and workflow step by step:
+
+```bash
+jupyter notebook
+```
+
+The notebooks are organized in numerical order:
+
+```text
+01 → 02 → 03 → 04 → 05
+```
+
+They contain the detailed dataset inspection, data cleaning and aggregation, exploratory data analysis, feature engineering, modeling, prediction, and conclusion workflow.
+
+## Challenges
+
+Some of the main challenges encountered during the project included:
+
+- The raw datasets were stored at different levels of detail, requiring historical oil/thermal and load measurements to be aggregated before merging with transformer-level information.
+- The target classes were imbalanced, making accuracy alone insufficient for evaluating the model.
+- Initial model approaches did not provide the desired Fault detection performance, which led to comparison of multiple algorithms and the use of balanced class weights.
+- The limited number of labeled transformers restricted the amount of training data available for the classification model.
+
+## Limitations
+
+- The labeled dataset contains only 198 transformers, which limits the amount of data available for model training and evaluation.
+- Model performance is dependent on the quality and representativeness of the provided transformer, thermal/oil, and load data.
+- The Fault Recall of 0.596 means that the model does not identify every actual Fault case.
+- The model should not be treated as a standalone diagnostic system. Predictions should be followed by appropriate engineering inspection and verification.
+- The dataset is specific to the provided project scenario, so model performance may not generalize directly to other transformer populations or operating environments.
+
+## Future Work
+
+Possible improvements include:
+
+- Collecting a larger and more diverse set of labeled transformer records.
+- Adding additional electrical, environmental, and maintenance-history features.
+- Exploring additional models and hyperparameter optimization techniques.
+- Evaluating probability thresholds to prioritize higher Fault Recall when appropriate.
+- Testing the model on new real-world transformer data.
+- Developing a monitoring interface that can help maintenance teams review model predictions and prioritize inspections.
+
+## Conclusion
+
+This project demonstrates an end-to-end machine learning workflow for transformer fault classification, including data inspection, cleaning, aggregation, exploratory analysis, feature engineering, model comparison, evaluation, tuning, and final prediction.
+
+The final Logistic Regression model provides a **selected early-warning approach** for identifying potentially faulty transformers. Its performance also highlights the limitations of working with a small and imbalanced labeled dataset, making further data collection and validation important for any real-world deployment.
